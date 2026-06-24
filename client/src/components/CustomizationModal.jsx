@@ -67,7 +67,7 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
       });
     }
 
-    onConfirm(customizationDetails, customizationPrice);
+    onConfirm(customizationDetails, customizationPrice, product);
     setSelections({});
     onClose();
   };

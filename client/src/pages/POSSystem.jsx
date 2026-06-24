@@ -95,7 +95,7 @@ function POSSystem() {
   const q = searchQuery.trim().toLowerCase();
   const filteredProducts =
     q.length > 0
-      ? products.filter((p) => p.name.toLowerCase().includes(q))
+      ? products.filter((p) => p?.name?.toLowerCase().includes(q))
       : selectedCategory
         ? products.filter(
             (p) => p.category && p.category._id === selectedCategory,
@@ -117,6 +117,7 @@ function POSSystem() {
     selections,
     customizationPrice,
   ) => {
+    if (!product) return;
     // Create unique ID for this product-customization combo
     const customizationKey = JSON.stringify(selections);
     const itemId = `${product._id}-${customizationKey}`;
@@ -765,9 +766,9 @@ function POSSystem() {
           setCustomizationModalOpen(false);
           setSelectedProductForCustomization(null);
         }}
-        onConfirm={(selections, customizationPrice) => {
+        onConfirm={(selections, customizationPrice, product) => {
           addToCartWithCustomizations(
-            selectedProductForCustomization,
+            product ?? selectedProductForCustomization,
             selections,
             customizationPrice,
           );

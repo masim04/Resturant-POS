@@ -61,38 +61,34 @@ function EditMenu() {
       toast.error("Please fill in all required fields");
       return;
     }
-    const formData = new FormData();
 
-    formData.append("name", editingProduct.name);
-    formData.append("price", editingProduct.price);
+    try {
+      const formData = new FormData();
+      formData.append("name", productName.trim());
+      formData.append("price", price);
+      formData.append("category", category);
 
-    formData.append(
-      "category",
-      editingProduct.category?._id || editingProduct.category,
-    );
+      if (image) {
+        formData.append("image", image);
+      }
 
-    formData.append(
-      "customizationGroups",
-      JSON.stringify(editingProduct.customizationGroups || []),
-    );
+      await axios.post(`${API_URL}/products`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    if (editingProduct.image instanceof File) {
-      formData.append("image", editingProduct.image);
+      setProductName("");
+      setPrice("");
+      setCategory("");
+      setImage(null);
+      fetchProducts();
+      toast.success("Product added");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to add product");
     }
-    if (image) {
-      formData.append("image", image);
-    }
-    await axios.post(`${API_URL}/products`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    setProductName("");
-    setPrice("");
-    setCategory("");
-    setImage(null);
-    fetchProducts();
   };
 
   const deleteProduct = async (id) => {
