@@ -1,0 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-pos-bg: #f5f5f5;
+  --color-pos-orange: #f28b27;
+  --color-pos-orange-hover: #e07d1f;
+  --color-pos-green: #28a745;
+  --color-pos-green-hover: #218838;
+  --color-pos-muted: #777777;
+  --color-pos-text: #333333;
+  --color-pos-peach: #fff4e5;
+  --color-pos-border: #e0e0e0;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+  body {
+    @apply m-0 bg-pos-bg text-pos-text antialiased;
+  }
+  #root {
+    min-height: 100vh;
+  }
+}
+
+/* Hide horizontal scrollbar but keep touch / wheel scroll (POS category rail). */
+@layer utilities {
+  .scrollbar-pos-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-pos-hide::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* Slim vertical scrollbar for product grid / cart lists. */
+  .scrollbar-pos-y {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-pos-border) transparent;
+  }
+  .scrollbar-pos-y::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-pos-y::-webkit-scrollbar-thumb {
+    background-color: var(--color-pos-border);
+    border-radius: 9999px;
+  }
+  .scrollbar-pos-y::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
