@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext";
 import CustomerNavbar from "../components/CustomerNavbar";
 import CustomizationModal from "../components/CustomizationModal";
 import TodaysOffers from "../components/TodaysOffers";
+import { API_URL, assetUrl } from "../constants";
 
 function Menu() {
   const [products, setProducts] = useState([]);
@@ -20,8 +21,8 @@ function Menu() {
     (async () => {
       try {
         const [prodRes, catRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/products"),
-          axios.get("http://localhost:5000/api/categories"),
+          axios.get(`${API_URL}/products`),
+          axios.get(`${API_URL}/categories`),
         ]);
         if (!cancelled) {
           setProducts(prodRes.data);
@@ -170,7 +171,7 @@ function Menu() {
                 <div className="relative aspect-4/3 overflow-hidden bg-cafe-100">
                   {p.image ? (
                     <img
-                      src={`http://localhost:5000${p.image}`}
+                      src={assetUrl(p.image)}
                       alt=""
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                     />

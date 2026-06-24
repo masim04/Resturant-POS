@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import CustomerNavbar from "../components/CustomerNavbar";
-import { DELIVERY_CHARGE_RS } from "../constants";
+import { API_URL, DELIVERY_CHARGE_RS } from "../constants";
 
 function Checkout() {
   const { cart, getTotal, setCart } = useCart();
@@ -57,7 +57,7 @@ function Checkout() {
         deliveryCharges: orderType === "delivery" ? DELIVERY_CHARGE_RS : 0,
       };
 
-      const res = await axios.post("http://localhost:5000/api/orders", orderData);
+      const res = await axios.post(`${API_URL}/orders`, orderData);
 
       alert("Order placed successfully!");
       setCart([]);

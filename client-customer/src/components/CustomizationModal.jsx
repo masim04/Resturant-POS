@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { getFinalPrice, getDiscountBadgeText } from "../utils/priceHelper";
+import { assetUrl } from "../constants";
 
 export default function CustomizationModal({ product, isOpen, onClose, onConfirm }) {
   const [selections, setSelections] = useState({});
@@ -97,7 +98,7 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
         {product.image && (
           <div className="relative h-48 overflow-hidden bg-cafe-100">
             <img
-              src={`http://localhost:5000${product.image}`}
+              src={assetUrl(product.image)}
               alt={product.name}
               className="h-full w-full object-cover"
             />

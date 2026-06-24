@@ -1,7 +1,7 @@
 import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import CustomerNavbar from "../components/CustomerNavbar";
-import { DELIVERY_CHARGE_RS } from "../constants";
+import { DELIVERY_CHARGE_RS, assetUrl } from "../constants";
 
 function Cart() {
   const { cart, increaseQty, decreaseQty, removeFromCart, getTotal } = useCart();
@@ -48,7 +48,7 @@ function Cart() {
                       <div className="flex min-w-0 gap-4">
                         {item.image ? (
                           <img
-                            src={`http://localhost:5000${item.image}`}
+                            src={assetUrl(item.image)}
                             alt=""
                             className="h-20 w-20 shrink-0 rounded-2xl object-cover ring-1 ring-cafe-100"
                           />

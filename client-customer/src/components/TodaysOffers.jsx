@@ -1,4 +1,5 @@
 import { getFinalPrice, getDiscountBadgeText } from "../utils/priceHelper";
+import { assetUrl } from "../constants";
 
 function TodaysOffers({ products, onAddToCart }) {
   // Filter products that have discount enabled
@@ -46,7 +47,7 @@ function TodaysOffers({ products, onAddToCart }) {
               <div className="relative aspect-4/3 overflow-hidden bg-cafe-100">
                 {product.image ? (
                   <img
-                    src={`http://localhost:5000${product.image}`}
+                    src={assetUrl(product.image)}
                     alt={product.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                   />

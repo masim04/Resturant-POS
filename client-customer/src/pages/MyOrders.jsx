@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import CustomerNavbar from "../components/CustomerNavbar";
+import { API_URL } from "../constants";
 
 function MyOrders() {
   const [phone, setPhone] = useState("");
@@ -9,7 +10,7 @@ function MyOrders() {
 
   const fetchOrders = async () => {
     setSearched(true);
-    const res = await axios.get(`http://localhost:5000/api/orders?phone=${encodeURIComponent(phone)}`);
+    const res = await axios.get(`${API_URL}/orders?phone=${encodeURIComponent(phone)}`);
     setOrders(res.data);
   };
 
