@@ -82,19 +82,8 @@ function CustomerNavbar() {
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Link
-              to="/my-orders"
-              className="inline-flex h-10 items-center gap-1.5 rounded-full border border-cafe-200 bg-white px-2.5 text-xs font-bold text-ink-900 transition hover:border-cafe-300 hover:bg-cafe-50 sm:h-11 sm:px-4 sm:text-sm md:hidden"
-              aria-label="Track order"
-            >
-              <svg className="h-4 w-4 shrink-0 text-cafe-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-              <span className="hidden min-[380px]:inline">Track</span>
-            </Link>
-
-            <Link
               to="/cart"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-cafe-200 bg-white text-ink-900 transition hover:border-cafe-300 hover:bg-cafe-50 sm:h-11 sm:w-11"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-cafe-200 bg-white text-ink-900 transition hover:border-cafe-300 hover:bg-cafe-50 sm:h-11 sm:w-11 md:hidden"
               aria-label={`Cart${count > 0 ? `, ${count} items` : ""}`}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -109,7 +98,7 @@ function CustomerNavbar() {
 
             <Link
               to="/menu"
-              className="btn-primary hidden px-4 py-2.5 text-sm sm:inline-flex lg:px-5"
+              className="btn-primary hidden px-4 py-2.5 text-sm md:inline-flex lg:px-5"
             >
               Order Now
             </Link>
@@ -168,9 +157,9 @@ function CustomerNavbar() {
                   </NavLink>
                 ),
               )}
-              <Link to="/menu" className="btn-primary mt-2 justify-center py-3.5" onClick={closeMobile}>
+              <NavLink to="/menu" className={mobileNavLinkClass} onClick={closeMobile}>
                 Order Now
-              </Link>
+              </NavLink>
             </nav>
           </div>
         </>
