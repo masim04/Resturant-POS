@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
@@ -15,6 +15,7 @@ function Menu() {
   const { addToCart, getCartItemCount } = useCart();
   const [customizationModalOpen, setCustomizationModalOpen] = useState(false);
   const [selectedProductForCustomization, setSelectedProductForCustomization] = useState(null);
+  const categoryScrollRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -59,6 +60,15 @@ function Menu() {
     } else {
       addToCart(product);
     }
+  };
+
+  const scrollCategories = (dir) => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+    el.scrollBy({
+      left: dir * Math.max(160, el.clientWidth * 0.55),
+      behavior: "smooth",
+    });
   };
 
   return (
@@ -115,7 +125,31 @@ function Menu() {
         />
 
         <div className="sticky top-17 z-30 -mx-4 border-y border-cafe-100 bg-white/95 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
-          <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="relative">
+            <button
+              type="button"
+              aria-label="Scroll categories left"
+              onClick={() => scrollCategories(-1)}
+              className="absolute left-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-cafe-200 bg-white text-ink-700 shadow-sm transition hover:border-cafe-400"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="Scroll categories right"
+              onClick={() => scrollCategories(1)}
+              className="absolute right-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-cafe-200 bg-white text-ink-700 shadow-sm transition hover:border-cafe-400"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <div
+              ref={categoryScrollRef}
+              className="flex gap-2 overflow-x-auto px-9 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
             <button
               type="button"
               onClick={() => setSelectedCategory("")}
@@ -143,6 +177,7 @@ function Menu() {
                 {c.name}
               </button>
             ))}
+            </div>
           </div>
         </div>
 
@@ -234,8 +269,8 @@ function Menu() {
             setCustomizationModalOpen(false);
             setSelectedProductForCustomization(null);
           }}
-          onConfirm={(selections, customizationPrice) => {
-            addToCart(selectedProductForCustomization, selections, customizationPrice);
+          onConfirm={(selections, customizationPrice, product) => {
+            addToCart(product ?? selectedProductForCustomization, selections, customizationPrice);
           }}
         />
       </div>

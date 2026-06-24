@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import CustomerNavbar from "../components/CustomerNavbar";
 import CustomerFooter from "../components/CustomerFooter";
 import DishCard from "../components/DishCard";
+import CustomizationModal from "../components/CustomizationModal";
+import { useCart } from "../context/CartContext";
 import { API_BASE } from "../constants";
 
 const HERO_CATEGORIES = [
@@ -44,11 +46,15 @@ function SectionArrows({ onPrev, onNext }) {
 }
 
 function Home() {
+  const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [customizationModalOpen, setCustomizationModalOpen] = useState(false);
+  const [selectedProductForCustomization, setSelectedProductForCustomization] = useState(null);
   const popularRef = useRef(null);
+  const categoryScrollRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -87,6 +93,24 @@ function Home() {
   const scrollPopular = (dir) => {
     if (!popularRef.current) return;
     popularRef.current.scrollBy({ left: dir * 300, behavior: "smooth" });
+  };
+
+  const scrollCategories = (dir) => {
+    const el = categoryScrollRef.current;
+    if (!el) return;
+    el.scrollBy({
+      left: dir * Math.max(160, el.clientWidth * 0.55),
+      behavior: "smooth",
+    });
+  };
+
+  const handleAddToCart = (product) => {
+    if (product.customizationGroups?.length > 0) {
+      setSelectedProductForCustomization(product);
+      setCustomizationModalOpen(true);
+    } else {
+      addToCart(product);
+    }
   };
 
   return (
@@ -155,7 +179,7 @@ function Home() {
             className="flex gap-6 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4 [&::-webkit-scrollbar]:hidden"
           >
             {popularProducts.map((p) => (
-              <DishCard key={p._id} product={p} />
+              <DishCard key={p._id} product={p} onAddToCart={handleAddToCart} />
             ))}
           </div>
         )}
@@ -231,32 +255,57 @@ function Home() {
             Pick a category and add your favourites straight to the cart.
           </p>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-2">
+          <div className="relative mt-8">
             <button
               type="button"
-              onClick={() => setSelectedCategory("")}
-              className={[
-                "rounded-full px-5 py-2.5 text-sm font-bold transition",
-                selectedCategory === "" ? "bg-cafe-400 text-white shadow-cafe" : "border border-cafe-200 bg-white text-ink-800 hover:bg-cafe-50",
-              ].join(" ")}
+              aria-label="Scroll categories left"
+              onClick={() => scrollCategories(-1)}
+              className="absolute left-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-cafe-200 bg-white text-ink-700 shadow-sm transition hover:border-cafe-400 hover:text-cafe-700"
             >
-              All
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
-            {categories.map((c) => (
+            <button
+              type="button"
+              aria-label="Scroll categories right"
+              onClick={() => scrollCategories(1)}
+              className="absolute right-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-cafe-200 bg-white text-ink-700 shadow-sm transition hover:border-cafe-400 hover:text-cafe-700"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <div
+              ref={categoryScrollRef}
+              className="flex gap-2 overflow-x-auto px-10 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
               <button
-                key={c._id}
                 type="button"
-                onClick={() => setSelectedCategory(c._id)}
+                onClick={() => setSelectedCategory("")}
                 className={[
-                  "rounded-full px-5 py-2.5 text-sm font-bold transition",
-                  selectedCategory === c._id
-                    ? "bg-cafe-400 text-white shadow-cafe"
-                    : "border border-cafe-200 bg-white text-ink-800 hover:bg-cafe-50",
+                  "shrink-0 rounded-full px-5 py-2.5 text-sm font-bold transition",
+                  selectedCategory === "" ? "bg-cafe-400 text-white shadow-cafe" : "border border-cafe-200 bg-white text-ink-800 hover:bg-cafe-50",
                 ].join(" ")}
               >
-                {c.name}
+                All
               </button>
-            ))}
+              {categories.map((c) => (
+                <button
+                  key={c._id}
+                  type="button"
+                  onClick={() => setSelectedCategory(c._id)}
+                  className={[
+                    "shrink-0 rounded-full px-5 py-2.5 text-sm font-bold transition",
+                    selectedCategory === c._id
+                      ? "bg-cafe-400 text-white shadow-cafe"
+                      : "border border-cafe-200 bg-white text-ink-800 hover:bg-cafe-50",
+                  ].join(" ")}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="mx-auto mt-6 max-w-md">
@@ -273,7 +322,9 @@ function Home() {
             {menuProducts.length === 0 ? (
               <p className="col-span-full text-center text-ink-700">No dishes found. Try another category.</p>
             ) : (
-              menuProducts.map((p) => <DishCard key={p._id} product={p} />)
+              menuProducts.map((p) => (
+                <DishCard key={p._id} product={p} onAddToCart={handleAddToCart} />
+              ))
             )}
           </div>
 
@@ -316,6 +367,18 @@ function Home() {
       </section>
 
       <CustomerFooter />
+
+      <CustomizationModal
+        product={selectedProductForCustomization}
+        isOpen={customizationModalOpen}
+        onClose={() => {
+          setCustomizationModalOpen(false);
+          setSelectedProductForCustomization(null);
+        }}
+        onConfirm={(selections, customizationPrice, product) => {
+          addToCart(product ?? selectedProductForCustomization, selections, customizationPrice);
+        }}
+      />
     </div>
   );
 }

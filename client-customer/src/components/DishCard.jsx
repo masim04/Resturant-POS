@@ -14,9 +14,17 @@ function StarRating() {
   );
 }
 
-function DishCard({ product }) {
+function DishCard({ product, onAddToCart }) {
   const { addToCart } = useCart();
   const imgSrc = product.image ? `${API_BASE}${product.image}` : null;
+
+  const handleAdd = () => {
+    if (onAddToCart) {
+      onAddToCart(product);
+      return;
+    }
+    addToCart(product);
+  };
 
   // Calculate final price with discount
   const priceData = getFinalPrice(
@@ -68,7 +76,7 @@ function DishCard({ product }) {
         </div>
         <button
           type="button"
-          onClick={() => addToCart(product)}
+          onClick={handleAdd}
           className="inline-flex items-center gap-1.5 rounded-full border-2 border-cafe-300 bg-white px-4 py-2 text-xs font-bold text-ink-900 transition hover:border-cafe-400 hover:bg-cafe-50"
         >
           <span className="grid h-5 w-5 place-items-center rounded-full bg-cafe-400 text-white">
