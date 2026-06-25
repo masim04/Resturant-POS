@@ -15,6 +15,7 @@ function EditMenu() {
   const [image, setImage] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const token = sessionStorage.getItem("token");
 
   const fetchCategories = async () => {
@@ -241,13 +242,25 @@ function EditMenu() {
           </div>
 
           {/* Products List */}
-          <div className="mb-4">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row">
             <input
-              className="w-full rounded-md border border-pos-border px-4 py-3 text-pos-text focus:border-pos-orange focus:outline-none focus:ring-2 focus:ring-pos-peach"
+              className="flex-1 rounded-md border border-pos-border px-4 py-3 text-pos-text focus:border-pos-orange focus:outline-none focus:ring-2 focus:ring-pos-peach"
               placeholder="Search products..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            <select
+              className="rounded-md border border-pos-border bg-white px-4 py-3 text-pos-text focus:border-pos-orange focus:outline-none focus:ring-2 focus:ring-pos-peach sm:w-64"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="">All Categories</option>
+              {categories.map((c) => (
+                <option key={c._id} value={c._id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid gap-4">
@@ -255,9 +268,17 @@ function EditMenu() {
               <p className="py-8 text-center text-pos-muted">No products yet</p>
             ) : (
               products
-                .filter((p) =>
-                  (p.name || "").toLowerCase().includes(search.toLowerCase()),
-                )
+                .filter((p) => {
+                  const matchesSearch = (p.name || "")
+                    .toLowerCase()
+                    .includes(search.toLowerCase());
+                  const matchesCategory = !selectedCategory
+                    || (typeof p.category === "string"
+                      ? p.category === selectedCategory
+                      : p.category?._id === selectedCategory);
+
+                  return matchesSearch && matchesCategory;
+                })
                 .map((p) => (
                   <div
                     key={p._id}
