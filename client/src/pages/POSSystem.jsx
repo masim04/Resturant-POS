@@ -1,39 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { useReactToPrint } from "react-to-print";
-import Receipt from "../components/Receipt";
-import KitchenReceipt from "../components/KitchenReceipt";
 import CustomizationModal from "../components/CustomizationModal";
 import { getFinalPrice, getDiscountBadgeText } from "../utils/priceHelper";
+import { printOrderReceipts } from "../utils/printReceipt";
 import { API_URL, assetUrl } from "../config";
 import toast from "react-hot-toast";
-
-const waitForPrintContent = (ref, attempts = 30) =>
-  new Promise((resolve, reject) => {
-    const check = (remaining) => {
-      if (ref.current?.innerHTML?.trim()) {
-        resolve();
-        return;
-      }
-      if (remaining <= 0) {
-        reject(new Error("Print content not ready"));
-        return;
-      }
-      requestAnimationFrame(() => check(remaining - 1));
-    };
-    check(attempts);
-  });
-
-const hiddenPrintStyle = {
-  position: "fixed",
-  left: 0,
-  top: 0,
-  opacity: 0,
-  pointerEvents: "none",
-  zIndex: -1,
-  width: "80mm",
-  maxWidth: "220px",
-};
 
 function POSSystem() {
   const [categories, setCategories] = useState([]);
@@ -51,78 +22,10 @@ function POSSystem() {
   const [isPaid, setIsPaid] = useState(false);
   const categoryScrollRef = useRef(null);
   const [extraNotes, setExtraNotes] = useState("");
-  const [lastOrder, setLastOrder] = useState(null);
-  const customerReceiptRef = useRef(null);
-  const kitchenReceiptRef = useRef(null);
-  const printCustomerNextRef = useRef(false);
-  const lastPrintedOrderIdRef = useRef(null);
   const [customizationModalOpen, setCustomizationModalOpen] = useState(false);
   const [selectedProductForCustomization, setSelectedProductForCustomization] =
     useState(null);
 
-  const printCustomer = useReactToPrint({
-    contentRef: customerReceiptRef,
-    documentTitle: "Cafe Rubab Receipt",
-    onBeforePrint: () =>
-      new Promise((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve));
-      }),
-    onPrintError: (_location, error) => {
-      console.error("Customer receipt print error:", error);
-      toast.error("Customer receipt could not print");
-    },
-  });
-
-  const printKitchen = useReactToPrint({
-    contentRef: kitchenReceiptRef,
-    documentTitle: "Cafe Rubab Kitchen Receipt",
-    onBeforePrint: () =>
-      new Promise((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve));
-      }),
-    onAfterPrint: () => {
-      if (!printCustomerNextRef.current) return;
-      printCustomerNextRef.current = false;
-      window.setTimeout(() => {
-        printCustomer();
-      }, 400);
-    },
-    onPrintError: (_location, error) => {
-      console.error("Kitchen receipt print error:", error);
-      printCustomerNextRef.current = false;
-      toast.error("Kitchen receipt could not print");
-    },
-  });
-
-  useEffect(() => {
-    if (!lastOrder?._id) return;
-    if (lastPrintedOrderIdRef.current === lastOrder._id) return;
-
-    let cancelled = false;
-
-    const runPrint = async () => {
-      try {
-        await waitForPrintContent(kitchenReceiptRef);
-        if (cancelled) return;
-
-        await waitForPrintContent(customerReceiptRef);
-        if (cancelled) return;
-
-        lastPrintedOrderIdRef.current = lastOrder._id;
-        printCustomerNextRef.current = true;
-        printKitchen();
-      } catch (error) {
-        console.error("Print setup failed:", error);
-        toast.error("Receipt printing failed. Try printing again from orders.");
-      }
-    };
-
-    runPrint();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lastOrder, printKitchen, printCustomer]);
   const scrollCategoryRow = (direction) => {
     const el = categoryScrollRef.current;
     if (!el) return;
@@ -298,7 +201,6 @@ function POSSystem() {
 
       const savedOrder = res.data;
 
-      setLastOrder(savedOrder);
       setShowCheckout(false);
 
       setCart([]);
@@ -310,6 +212,11 @@ function POSSystem() {
       setIsPaid(false);
 
       toast.success("Order created successfully");
+
+      printOrderReceipts(savedOrder).catch((error) => {
+        console.error("Print failed:", error);
+        toast.error("Order saved but printing failed. Check printer and try again.");
+      });
     } catch (error) {
       console.error("FULL ERROR:", error);
 
@@ -832,12 +739,6 @@ function POSSystem() {
           );
         }}
       />
-      <div ref={kitchenReceiptRef} style={hiddenPrintStyle} aria-hidden>
-        {lastOrder && <KitchenReceipt order={lastOrder} />}
-      </div>
-      <div ref={customerReceiptRef} style={hiddenPrintStyle} aria-hidden>
-        {lastOrder && <Receipt order={lastOrder} />}
-      </div>
     </div>
   );
 }
