@@ -8,6 +8,33 @@ import { getFinalPrice, getDiscountBadgeText } from "../utils/priceHelper";
 import { API_URL, assetUrl } from "../config";
 import toast from "react-hot-toast";
 
+const waitForPrintContent = (ref, attempts = 30) =>
+  new Promise((resolve, reject) => {
+    const check = (remaining) => {
+      if (ref.current?.innerHTML?.trim()) {
+        resolve();
+        return;
+      }
+      if (remaining <= 0) {
+        reject(new Error("Print content not ready"));
+        return;
+      }
+      requestAnimationFrame(() => check(remaining - 1));
+    };
+    check(attempts);
+  });
+
+const hiddenPrintStyle = {
+  position: "fixed",
+  left: 0,
+  top: 0,
+  opacity: 0,
+  pointerEvents: "none",
+  zIndex: -1,
+  width: "80mm",
+  maxWidth: "220px",
+};
+
 function POSSystem() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -25,8 +52,10 @@ function POSSystem() {
   const categoryScrollRef = useRef(null);
   const [extraNotes, setExtraNotes] = useState("");
   const [lastOrder, setLastOrder] = useState(null);
-  const customerReceiptRef = useRef();
-  const kitchenReceiptRef = useRef();
+  const customerReceiptRef = useRef(null);
+  const kitchenReceiptRef = useRef(null);
+  const printCustomerNextRef = useRef(false);
+  const lastPrintedOrderIdRef = useRef(null);
   const [customizationModalOpen, setCustomizationModalOpen] = useState(false);
   const [selectedProductForCustomization, setSelectedProductForCustomization] =
     useState(null);
@@ -34,43 +63,64 @@ function POSSystem() {
   const printCustomer = useReactToPrint({
     contentRef: customerReceiptRef,
     documentTitle: "Cafe Rubab Receipt",
-    onBeforeGetContent: () =>
-      new Promise((resolve) => setTimeout(resolve, 50)),
-    removeAfterPrint: true,
+    onBeforePrint: () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      }),
+    onPrintError: (_location, error) => {
+      console.error("Customer receipt print error:", error);
+      toast.error("Customer receipt could not print");
+    },
   });
 
   const printKitchen = useReactToPrint({
     contentRef: kitchenReceiptRef,
     documentTitle: "Cafe Rubab Kitchen Receipt",
-    onBeforeGetContent: () =>
-      new Promise((resolve) => setTimeout(resolve, 50)),
-    removeAfterPrint: true,
+    onBeforePrint: () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      }),
+    onAfterPrint: () => {
+      if (!printCustomerNextRef.current) return;
+      printCustomerNextRef.current = false;
+      window.setTimeout(() => {
+        printCustomer();
+      }, 400);
+    },
+    onPrintError: (_location, error) => {
+      console.error("Kitchen receipt print error:", error);
+      printCustomerNextRef.current = false;
+      toast.error("Kitchen receipt could not print");
+    },
   });
 
   useEffect(() => {
-    if (!lastOrder) return;
-    let isMounted = true;
+    if (!lastOrder?._id) return;
+    if (lastPrintedOrderIdRef.current === lastOrder._id) return;
+
+    let cancelled = false;
 
     const runPrint = async () => {
-      await new Promise((r) => setTimeout(r, 300));
-      if (!isMounted) return;
+      try {
+        await waitForPrintContent(kitchenReceiptRef);
+        if (cancelled) return;
 
-      // Give DOM a moment to render the hidden receipts
-      await new Promise((r) => setTimeout(r, 500));
-      if (!isMounted) return;
+        await waitForPrintContent(customerReceiptRef);
+        if (cancelled) return;
 
-      printKitchen();
-
-      await new Promise((r) => setTimeout(r, 800));
-      if (!isMounted) return;
-
-      printCustomer();
+        lastPrintedOrderIdRef.current = lastOrder._id;
+        printCustomerNextRef.current = true;
+        printKitchen();
+      } catch (error) {
+        console.error("Print setup failed:", error);
+        toast.error("Receipt printing failed. Try printing again from orders.");
+      }
     };
 
     runPrint();
 
     return () => {
-      isMounted = false;
+      cancelled = true;
     };
   }, [lastOrder, printKitchen, printCustomer]);
   const scrollCategoryRow = (direction) => {
@@ -782,29 +832,11 @@ function POSSystem() {
           );
         }}
       />
-      <div
-        style={{
-          position: "fixed",
-          left: "-9999px",
-          top: 0,
-          width: 0,
-          height: 0,
-          overflow: "hidden",
-          pointerEvents: "none",
-        }}
-      >
-        {lastOrder && (
-          <>
-            <Receipt
-              ref={customerReceiptRef}
-              order={lastOrder || { items: [] }}
-            />
-            <KitchenReceipt
-              ref={kitchenReceiptRef}
-              order={lastOrder || { items: [] }}
-            />
-          </>
-        )}
+      <div ref={kitchenReceiptRef} style={hiddenPrintStyle} aria-hidden>
+        {lastOrder && <KitchenReceipt order={lastOrder} />}
+      </div>
+      <div ref={customerReceiptRef} style={hiddenPrintStyle} aria-hidden>
+        {lastOrder && <Receipt order={lastOrder} />}
       </div>
     </div>
   );
