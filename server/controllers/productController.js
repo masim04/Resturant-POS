@@ -90,6 +90,12 @@ const updateProduct = async (req, res) => {
             _id: opt._id || new mongoose.Types.ObjectId(),
             name: opt.name || "",
             extraPrice: parseFloat(opt.extraPrice) || 0,
+            isDeal: opt.isDeal === true || opt.isDeal === "true",
+            dealOptions: (opt.dealOptions || []).map((dealOpt) => ({
+              _id: dealOpt._id || new mongoose.Types.ObjectId(),
+              name: dealOpt.name || "",
+              extraPrice: parseFloat(dealOpt.extraPrice) || 0,
+            })),
           })),
         }));
     }

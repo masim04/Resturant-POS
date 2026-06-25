@@ -37,6 +37,14 @@ const productSchema = new mongoose.Schema({
           _id: mongoose.Schema.Types.ObjectId,
           name: String,
           extraPrice: { type: Number, default: 0 },
+          isDeal: { type: Boolean, default: false },
+          dealOptions: [
+            {
+              _id: mongoose.Schema.Types.ObjectId,
+              name: String,
+              extraPrice: { type: Number, default: 0 },
+            },
+          ],
         },
       ],
     },
