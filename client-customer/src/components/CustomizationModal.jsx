@@ -12,11 +12,23 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
         if (group.multiSelect && selections[group._id]) {
           selections[group._id].forEach((optId) => {
             const option = group.options?.find((o) => o._id === optId);
-            if (option) total += option.extraPrice || 0;
+            if (option) {
+              total += option.extraPrice || 0;
+              if (option.isDeal && selections[`${group._id}-${option._id}`]) {
+                const dealOption = option.dealOptions?.find((o) => o._id === selections[`${group._id}-${option._id}`]);
+                if (dealOption) total += dealOption.extraPrice || 0;
+              }
+            }
           });
         } else if (!group.multiSelect && selections[group._id]) {
           const option = group.options?.find((o) => o._id === selections[group._id]);
-          if (option) total += option.extraPrice || 0;
+          if (option) {
+            total += option.extraPrice || 0;
+            if (option.isDeal && selections[`${group._id}-${option._id}`]) {
+              const dealOption = option.dealOptions?.find((o) => o._id === selections[`${group._id}-${option._id}`]);
+              if (dealOption) total += dealOption.extraPrice || 0;
+            }
+          }
         }
       });
     }
@@ -62,10 +74,17 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
             selections[group._id].forEach((optionId, idx) => {
               const option = group.options?.find((o) => o._id === optionId);
               if (option) {
+                const dealSelection = option.isDeal ? selections[`${group._id}-${optionId}`] : null;
+                const dealOption = dealSelection
+                  ? option.dealOptions?.find((o) => o._id === dealSelection)
+                  : null;
+
                 customizationDetails[`${group._id}-${idx}`] = {
                   groupTitle: group.title,
                   optionName: option.name,
                   extraPrice: option.extraPrice || 0,
+                  dealOptionName: dealOption?.name || null,
+                  dealExtraPrice: dealOption?.extraPrice || 0,
                 };
               }
             });
@@ -73,10 +92,17 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
             // For single select
             const option = group.options?.find((o) => o._id === selections[group._id]);
             if (option) {
+              const dealSelection = option.isDeal ? selections[`${group._id}-${option._id}`] : null;
+              const dealOption = dealSelection
+                ? option.dealOptions?.find((o) => o._id === dealSelection)
+                : null;
+
               customizationDetails[group._id] = {
                 groupTitle: group.title,
                 optionName: option.name,
                 extraPrice: option.extraPrice || 0,
+                dealOptionName: dealOption?.name || null,
+                dealExtraPrice: dealOption?.extraPrice || 0,
               };
             }
           }
@@ -140,10 +166,8 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
                     // Multiple selection - Checkboxes
                     <div className="space-y-3">
                       {group.options?.map((option) => (
-                        <label
-                          key={option._id}
-                          className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-cafe-50 transition"
-                        >
+                        <div key={option._id} className="rounded-lg border border-cafe-100 p-3">
+                        <label className="flex items-center gap-3 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={
@@ -152,19 +176,16 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
                             }
                             onChange={(e) => {
                               const current = selections[group._id] || [];
+                              const nextSelections = { ...selections };
                               if (e.target.checked) {
-                                setSelections({
-                                  ...selections,
-                                  [group._id]: [...current, option._id],
-                                });
+                                nextSelections[group._id] = [...current, option._id];
                               } else {
-                                setSelections({
-                                  ...selections,
-                                  [group._id]: current.filter(
-                                    (id) => id !== option._id
-                                  ),
-                                });
+                                nextSelections[group._id] = current.filter(
+                                  (id) => id !== option._id
+                                );
+                                delete nextSelections[`${group._id}-${option._id}`];
                               }
+                              setSelections(nextSelections);
                             }}
                             className="h-5 w-5 rounded border-cafe-300 text-cafe-400 focus:ring-cafe-400 cursor-pointer"
                           />
@@ -179,16 +200,38 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
                             )}
                           </div>
                         </label>
+                        {option.isDeal && selections[group._id]?.includes(option._id) && (
+                          <div className="mt-3 ml-8 space-y-2">
+                            {option.dealOptions?.map((dealOption) => (
+                              <label key={dealOption._id} className="flex items-center gap-2 text-sm">
+                                <input
+                                  type="radio"
+                                  name={`${group._id}-${option._id}`}
+                                  checked={selections[`${group._id}-${option._id}`] === dealOption._id}
+                                  onChange={() =>
+                                    setSelections({
+                                      ...selections,
+                                      [`${group._id}-${option._id}`]: dealOption._id,
+                                    })
+                                  }
+                                />
+                                <span>{dealOption.name}</span>
+                                {dealOption.extraPrice > 0 && (
+                                  <span className="text-cafe-600">+£{dealOption.extraPrice.toFixed(2)}</span>
+                                )}
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       ))}
                     </div>
                   ) : (
                     // Single selection - Radio Buttons
                     <div className="space-y-3">
                       {group.options?.map((option) => (
-                        <label
-                          key={option._id}
-                          className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-cafe-50 transition"
-                        >
+                        <div key={option._id} className="rounded-lg border border-cafe-100 p-3">
+                        <label className="flex items-center gap-3 cursor-pointer">
                           <input
                             type="radio"
                             name={group._id}
@@ -196,10 +239,10 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
                               selections[group._id] === option._id
                             }
                             onChange={() => {
-                              setSelections({
-                                ...selections,
-                                [group._id]: option._id,
-                              });
+                              const nextSelections = { ...selections };
+                              nextSelections[group._id] = option._id;
+                              delete nextSelections[`${group._id}-${option._id}`];
+                              setSelections(nextSelections);
                             }}
                             className="h-5 w-5 border-cafe-300 text-cafe-400 focus:ring-cafe-400 cursor-pointer"
                           />
@@ -214,6 +257,30 @@ export default function CustomizationModal({ product, isOpen, onClose, onConfirm
                             )}
                           </div>
                         </label>
+                        {option.isDeal && selections[group._id] === option._id && (
+                          <div className="mt-3 ml-8 space-y-2">
+                            {option.dealOptions?.map((dealOption) => (
+                              <label key={dealOption._id} className="flex items-center gap-2 text-sm">
+                                <input
+                                  type="radio"
+                                  name={`${group._id}-${option._id}`}
+                                  checked={selections[`${group._id}-${option._id}`] === dealOption._id}
+                                  onChange={() =>
+                                    setSelections({
+                                      ...selections,
+                                      [`${group._id}-${option._id}`]: dealOption._id,
+                                    })
+                                  }
+                                />
+                                <span>{dealOption.name}</span>
+                                {dealOption.extraPrice > 0 && (
+                                  <span className="text-cafe-600">+£{dealOption.extraPrice.toFixed(2)}</span>
+                                )}
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       ))}
                     </div>
                   )}
