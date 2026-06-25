@@ -75,13 +75,22 @@ const KitchenReceipt = ({ order, ref }) => {
                     color: "#333",
                   }}
                 >
-                  {Object.values(item.customizations).map(
-                    (custom, idx) => (
+                  {Object.values(item.customizations).map((custom, idx) => {
+                    const hasDealSelection = custom.dealOptionName;
+                    const label = hasDealSelection
+                      ? `${custom.optionName} - ${custom.dealOptionName}`
+                      : custom.optionName;
+
+                    const extraPrice = (custom.extraPrice || 0) + (custom.dealExtraPrice || 0);
+                    const priceSuffix = extraPrice > 0 ? ` (+£${extraPrice.toFixed(2)})` : "";
+
+                    return (
                       <div key={`custom-${idx}`} style={{ margin: "2px 0" }}>
-                        • {custom.groupTitle}: {custom.optionName}
+                        • {label}
+                        {priceSuffix}
                       </div>
-                    ),
-                  )}
+                    );
+                  })}
                 </div>
               )}
           </div>

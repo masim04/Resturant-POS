@@ -105,15 +105,22 @@ const Receipt = ({ order, ref }) => {
                       color: "#555",
                     }}
                   >
-                    {Object.values(item.customizations).map(
-                      (custom, idx) => (
+                    {Object.values(item.customizations).map((custom, idx) => {
+                      const hasDealSelection = custom.dealOptionName;
+                      const label = hasDealSelection
+                        ? `${custom.optionName} - ${custom.dealOptionName}`
+                        : custom.optionName;
+
+                      const extraPrice = (custom.extraPrice || 0) + (custom.dealExtraPrice || 0);
+                      const priceSuffix = extraPrice > 0 ? ` (+£${extraPrice.toFixed(2)})` : "";
+
+                      return (
                         <div key={`custom-${idx}`} style={{ margin: "1px 0" }}>
-                          + {custom.groupTitle}: {custom.optionName}
-                          {custom.extraPrice > 0 &&
-                            ` (+£${custom.extraPrice})`}
+                          + {label}
+                          {priceSuffix}
                         </div>
-                      ),
-                    )}
+                      );
+                    })}
                   </div>
                 )}
 
