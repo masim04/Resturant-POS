@@ -3,73 +3,92 @@ import { renderToStaticMarkup } from "react-dom/server";
 import Receipt from "../components/Receipt";
 import KitchenReceipt from "../components/KitchenReceipt";
 
-function printHtml(bodyHtml, title) {
-  return new Promise((resolve, reject) => {
-    const iframe = document.createElement("iframe");
-    iframe.setAttribute(
-      "style",
-      "position:fixed;right:0;bottom:0;width:0;height:0;border:0;",
-    );
-    document.body.appendChild(iframe);
-
-    const win = iframe.contentWindow;
-    const doc = win?.document;
-
-    if (!win || !doc) {
-      iframe.remove();
-      reject(new Error("Print iframe could not be created"));
-      return;
-    }
-
-    const cleanup = () => {
-      iframe.remove();
-    };
-
-    const doPrint = () => {
-      try {
-        win.focus();
-        win.print();
-        resolve();
-      } catch (error) {
-        reject(error);
-      } finally {
-        window.setTimeout(cleanup, 1000);
-      }
-    };
-
-    doc.open();
-    doc.write(`<!DOCTYPE html>
+function buildPrintDocument(bodyHtml, title) {
+  return `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
     <title>${title}</title>
     <style>
-      @page { size: 80mm auto; margin: 4mm; }
+      @media print {
+        @page {
+          margin: 4mm;
+        }
+      }
       html, body {
         margin: 0;
-        padding: 0;
+        padding: 8px;
         background: #fff;
         color: #000;
+        font-family: monospace;
       }
     </style>
   </head>
   <body>${bodyHtml}</body>
-</html>`);
+</html>`;
+}
+
+function printHtml(bodyHtml, title) {
+  return new Promise((resolve, reject) => {
+    const content = bodyHtml?.trim();
+    if (!content) {
+      reject(new Error("Receipt content is empty"));
+      return;
+    }
+
+    const printWindow = window.open("", "_blank", "width=360,height=640");
+    if (!printWindow) {
+      reject(new Error("Popup blocked. Allow popups for this site to print receipts."));
+      return;
+    }
+
+    const doc = printWindow.document;
+    doc.open();
+    doc.write(buildPrintDocument(content, title));
     doc.close();
 
-    window.setTimeout(doPrint, 300);
+    const triggerPrint = () => {
+      try {
+        printWindow.focus();
+        printWindow.print();
+      } catch (error) {
+        printWindow.close();
+        reject(error);
+        return;
+      }
+
+      const finish = () => {
+        if (!printWindow.closed) {
+          printWindow.close();
+        }
+        resolve();
+      };
+
+      printWindow.onafterprint = finish;
+      window.setTimeout(finish, 2000);
+    };
+
+    if (printWindow.document.readyState === "complete") {
+      window.setTimeout(triggerPrint, 250);
+    } else {
+      printWindow.onload = () => window.setTimeout(triggerPrint, 250);
+    }
   });
 }
 
 function printComponent(Component, props, title) {
   const html = renderToStaticMarkup(createElement(Component, props));
+  if (!html?.trim()) {
+    return Promise.reject(new Error(`Failed to render ${title}`));
+  }
   return printHtml(html, title);
 }
 
 export async function printOrderReceipts(order) {
-  if (!order) return;
+  if (!order?.items?.length) {
+    throw new Error("Order has no items to print");
+  }
 
   await printComponent(KitchenReceipt, { order }, "Cafe Rubab - Kitchen");
-  await new Promise((resolve) => window.setTimeout(resolve, 600));
   await printComponent(Receipt, { order }, "Cafe Rubab - Receipt");
 }
