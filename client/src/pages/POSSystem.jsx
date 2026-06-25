@@ -33,10 +33,18 @@ function POSSystem() {
 
   const printCustomer = useReactToPrint({
     contentRef: customerReceiptRef,
+    documentTitle: "Cafe Rubab Receipt",
+    onBeforeGetContent: () =>
+      new Promise((resolve) => setTimeout(resolve, 50)),
+    removeAfterPrint: true,
   });
 
   const printKitchen = useReactToPrint({
     contentRef: kitchenReceiptRef,
+    documentTitle: "Cafe Rubab Kitchen Receipt",
+    onBeforeGetContent: () =>
+      new Promise((resolve) => setTimeout(resolve, 50)),
+    removeAfterPrint: true,
   });
 
   useEffect(() => {
@@ -774,7 +782,17 @@ function POSSystem() {
           );
         }}
       />
-      <div style={{ position: "absolute", left: "-9999px" }}>
+      <div
+        style={{
+          position: "fixed",
+          left: "-9999px",
+          top: 0,
+          width: 0,
+          height: 0,
+          overflow: "hidden",
+          pointerEvents: "none",
+        }}
+      >
         {lastOrder && (
           <>
             <Receipt

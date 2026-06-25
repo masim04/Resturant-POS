@@ -1,4 +1,6 @@
-const Receipt = ({ order, ref }) => {
+import { forwardRef } from "react";
+
+const Receipt = forwardRef(({ order }, ref) => {
   if (!order) return null;
 
   // Calculate base subtotal WITHOUT discounts to detect actual discount
@@ -222,6 +224,8 @@ const Receipt = ({ order, ref }) => {
       </div>
     </div>
   );
-};
+});
+
+Receipt.displayName = "Receipt";
 
 export default Receipt;

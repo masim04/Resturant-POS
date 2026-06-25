@@ -1,4 +1,6 @@
-const KitchenReceipt = ({ order, ref }) => {
+import { forwardRef } from "react";
+
+const KitchenReceipt = forwardRef(({ order }, ref) => {
   if (!order) return null;
 
   return (
@@ -123,6 +125,8 @@ const KitchenReceipt = ({ order, ref }) => {
       </div>
     </div>
   );
-};
+});
+
+KitchenReceipt.displayName = "KitchenReceipt";
 
 export default KitchenReceipt;
