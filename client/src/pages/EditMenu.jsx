@@ -571,61 +571,166 @@ function EditMenu() {
                           {/* Options */}
                           <div className="pl-2 space-y-2 border-l-2 border-pos-orange">
                             {group.options?.map((option, optIdx) => (
-                              <div key={optIdx} className="flex gap-2 text-xs">
-                                <input
-                                  className="flex-1 rounded border border-pos-border px-2 py-1 focus:outline-none"
-                                  placeholder="Option (e.g., Small)"
-                                  value={option.name}
-                                  onChange={(e) => {
-                                    const updated = [
-                                      ...editingProduct.customizationGroups,
-                                    ];
-                                    updated[groupIdx].options[optIdx].name =
-                                      e.target.value;
-                                    setEditingProduct({
-                                      ...editingProduct,
-                                      customizationGroups: updated,
-                                    });
-                                  }}
-                                />
-                                <input
-                                  type="number"
-                                  className="w-16 rounded border border-pos-border px-2 py-1 focus:outline-none"
-                                  placeholder="Price +£"
-                                  step="0.1"
-                                  value={option.extraPrice || 0}
-                                  onChange={(e) => {
-                                    const updated = [
-                                      ...editingProduct.customizationGroups,
-                                    ];
-                                    updated[groupIdx].options[
-                                      optIdx
-                                    ].extraPrice =
-                                      parseFloat(e.target.value) || 0;
-                                    setEditingProduct({
-                                      ...editingProduct,
-                                      customizationGroups: updated,
-                                    });
-                                  }}
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const updated = [
-                                      ...editingProduct.customizationGroups,
-                                    ];
-                                    updated[groupIdx].options = updated[
-                                      groupIdx
-                                    ].options.filter((_, i) => i !== optIdx);
-                                    setEditingProduct({
-                                      ...editingProduct,
-                                      customizationGroups: updated,
-                                    });
-                                  }}
-                                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                                >
-                                  Remove
-                                </button>
+                              <div key={optIdx} className="space-y-2 rounded border border-pos-border bg-white p-2 text-xs">
+                                <div className="flex gap-2">
+                                  <input
+                                    className="flex-1 rounded border border-pos-border px-2 py-1 focus:outline-none"
+                                    placeholder="Option (e.g., Small)"
+                                    value={option.name}
+                                    onChange={(e) => {
+                                      const updated = [
+                                        ...editingProduct.customizationGroups,
+                                      ];
+                                      updated[groupIdx].options[optIdx].name =
+                                        e.target.value;
+                                      setEditingProduct({
+                                        ...editingProduct,
+                                        customizationGroups: updated,
+                                      });
+                                    }}
+                                  />
+                                  <input
+                                    type="number"
+                                    className="w-16 rounded border border-pos-border px-2 py-1 focus:outline-none"
+                                    placeholder="Price +£"
+                                    step="0.1"
+                                    value={option.extraPrice || 0}
+                                    onChange={(e) => {
+                                      const updated = [
+                                        ...editingProduct.customizationGroups,
+                                      ];
+                                      updated[groupIdx].options[
+                                        optIdx
+                                      ].extraPrice =
+                                        parseFloat(e.target.value) || 0;
+                                      setEditingProduct({
+                                        ...editingProduct,
+                                        customizationGroups: updated,
+                                      });
+                                    }}
+                                  />
+                                  <label className="flex items-center gap-1 text-[11px] text-pos-text">
+                                    <input
+                                      type="checkbox"
+                                      checked={option.isDeal || false}
+                                      onChange={(e) => {
+                                        const updated = [
+                                          ...editingProduct.customizationGroups,
+                                        ];
+                                        updated[groupIdx].options[optIdx].isDeal =
+                                          e.target.checked;
+                                        if (!e.target.checked) {
+                                          updated[groupIdx].options[optIdx].dealOptions = [];
+                                        }
+                                        setEditingProduct({
+                                          ...editingProduct,
+                                          customizationGroups: updated,
+                                        });
+                                      }}
+                                    />
+                                    Deal
+                                  </label>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const updated = [
+                                        ...editingProduct.customizationGroups,
+                                      ];
+                                      updated[groupIdx].options = updated[
+                                        groupIdx
+                                      ].options.filter((_, i) => i !== optIdx);
+                                      setEditingProduct({
+                                        ...editingProduct,
+                                        customizationGroups: updated,
+                                      });
+                                    }}
+                                    className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+
+                                {option.isDeal && (
+                                  <div className="ml-2 rounded border border-dashed border-pos-orange bg-pos-bg p-2">
+                                    <div className="mb-2 text-[11px] font-semibold text-pos-orange">
+                                      Deal Options
+                                    </div>
+                                    {(option.dealOptions || []).map((dealOption, dealIdx) => (
+                                      <div key={dealIdx} className="mb-2 flex gap-2">
+                                        <input
+                                          className="flex-1 rounded border border-pos-border px-2 py-1 text-xs focus:outline-none"
+                                          placeholder="Deal option"
+                                          value={dealOption.name}
+                                          onChange={(e) => {
+                                            const updated = [
+                                              ...editingProduct.customizationGroups,
+                                            ];
+                                            updated[groupIdx].options[optIdx].dealOptions[dealIdx].name =
+                                              e.target.value;
+                                            setEditingProduct({
+                                              ...editingProduct,
+                                              customizationGroups: updated,
+                                            });
+                                          }}
+                                        />
+                                        <input
+                                          type="number"
+                                          className="w-16 rounded border border-pos-border px-2 py-1 text-xs focus:outline-none"
+                                          placeholder="+£"
+                                          step="0.1"
+                                          value={dealOption.extraPrice || 0}
+                                          onChange={(e) => {
+                                            const updated = [
+                                              ...editingProduct.customizationGroups,
+                                            ];
+                                            updated[groupIdx].options[optIdx].dealOptions[dealIdx].extraPrice =
+                                              parseFloat(e.target.value) || 0;
+                                            setEditingProduct({
+                                              ...editingProduct,
+                                              customizationGroups: updated,
+                                            });
+                                          }}
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const updated = [
+                                              ...editingProduct.customizationGroups,
+                                            ];
+                                            updated[groupIdx].options[optIdx].dealOptions =
+                                              updated[groupIdx].options[optIdx].dealOptions.filter((_, i) => i !== dealIdx);
+                                            setEditingProduct({
+                                              ...editingProduct,
+                                              customizationGroups: updated,
+                                            });
+                                          }}
+                                          className="rounded bg-red-500 px-2 py-1 text-[10px] text-white"
+                                        >
+                                          X
+                                        </button>
+                                      </div>
+                                    ))}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const updated = [
+                                          ...editingProduct.customizationGroups,
+                                        ];
+                                        updated[groupIdx].options[optIdx].dealOptions = [
+                                          ...(updated[groupIdx].options[optIdx].dealOptions || []),
+                                          { _id: null, name: "", extraPrice: 0 },
+                                        ];
+                                        setEditingProduct({
+                                          ...editingProduct,
+                                          customizationGroups: updated,
+                                        });
+                                      }}
+                                      className="text-[11px] text-pos-orange hover:underline"
+                                    >
+                                      + Add Deal Option
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             ))}
                             <button
@@ -636,7 +741,7 @@ function EditMenu() {
                                 ];
                                 updated[groupIdx].options = [
                                   ...(updated[groupIdx].options || []),
-                                  { _id: null, name: "", extraPrice: 0 },
+                                  { _id: null, name: "", extraPrice: 0, isDeal: false, dealOptions: [] },
                                 ];
                                 setEditingProduct({
                                   ...editingProduct,
