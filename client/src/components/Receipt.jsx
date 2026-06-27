@@ -43,8 +43,8 @@ const Receipt = forwardRef(({ order }, ref) => {
         }}
       >
         <h3 style={{ margin: "0 0 2px 0", fontSize: "13px" }}>Cafe Rubab</h3>
-        <p style={{ margin: "2px 0", fontSize: "10px" }}>POS Receipt</p>
-        <small style={{ fontSize: "9px" }}>Islamabad, Pakistan</small>
+        <p style={{ margin: "2px 0", fontSize: "10px" }}>+44 141 631 4400</p>
+        <small style={{ fontSize: "9px" }}>11 Lovat Pl, Rutherglen, Glasgow G73 5HS</small>
       </div>
 
       {/* ORDER INFO */}

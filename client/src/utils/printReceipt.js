@@ -89,6 +89,19 @@ export async function printOrderReceipts(order) {
     throw new Error("Order has no items to print");
   }
 
-  await printComponent(KitchenReceipt, { order }, "Cafe Rubab - Kitchen");
-  await printComponent(Receipt, { order }, "Cafe Rubab - Receipt");
+  const kitchenHtml = renderToStaticMarkup(
+    createElement(KitchenReceipt, { order }),
+  );
+  const receiptHtml = renderToStaticMarkup(createElement(Receipt, { order }));
+
+  if (!kitchenHtml?.trim() || !receiptHtml?.trim()) {
+    throw new Error("Failed to render receipt documents");
+  }
+
+  const combinedHtml = `
+    <div style="page-break-after: always;">${kitchenHtml}</div>
+    <div>${receiptHtml}</div>
+  `;
+
+  return printHtml(combinedHtml, "Cafe Rubab - Receipts");
 }
