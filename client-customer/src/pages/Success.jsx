@@ -1,12 +1,16 @@
 import { useLocation, Link } from "react-router-dom";
 import CustomerNavbar from "../components/CustomerNavbar";
-
+import { Helmet } from "react-helmet-async";
 function Success() {
   const location = useLocation();
   const order = location.state?.order;
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Cafe Rubab | Order Success</title>
+        <meta name="description" content="Your order has been successfully placed at Cafe Rubab. Thank you for ordering with us!" />
+      </Helmet>
       <CustomerNavbar />
       <div className="container mx-auto flex min-h-[calc(100vh-5rem)] items-center justify-center px-4 py-10 sm:px-6">
         <div className="card-surface w-full max-w-lg overflow-hidden p-8 shadow-cafe-lg sm:p-10">

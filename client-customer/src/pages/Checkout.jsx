@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import CustomerNavbar from "../components/CustomerNavbar";
 import { API_URL, DELIVERY_CHARGE_RS } from "../constants";
-
+import { Helmet } from "react-helmet-async";
 function Checkout() {
   const { cart, getTotal, setCart } = useCart();
   const navigate = useNavigate();
@@ -79,6 +79,10 @@ function Checkout() {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Cafe Rubab | Checkout</title>
+        <meta name="description" content="Checkout page for Cafe Rubab. Review your order and provide your details." />
+      </Helmet>
       <CustomerNavbar />
       <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-10">
         <div className="card-surface mx-auto max-w-5xl overflow-hidden shadow-cafe-lg">

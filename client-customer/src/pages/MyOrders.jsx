@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import CustomerNavbar from "../components/CustomerNavbar";
 import { API_URL } from "../constants";
-
+import { Helmet } from "react-helmet-async";
 function MyOrders() {
   const [phone, setPhone] = useState("");
   const [orders, setOrders] = useState([]);
@@ -16,6 +16,10 @@ function MyOrders() {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Cafe Rubab | My Orders</title>
+        <meta name="description" content="Track your orders at Cafe Rubab. Enter your phone number to see the status and totals of your orders." />
+      </Helmet>
       <CustomerNavbar />
       <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-10">
         <div className="card-surface mx-auto max-w-3xl overflow-hidden shadow-cafe-lg">

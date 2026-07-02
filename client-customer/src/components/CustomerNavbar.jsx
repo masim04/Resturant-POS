@@ -46,8 +46,8 @@ function CustomerNavbar() {
             className="flex min-w-0 shrink items-center gap-2 sm:gap-2.5"
             onClick={closeMobile}
           >
-            <span className="grid h-9 w-9 shrink-0 overflow-hidden rounded-full ring-2 ring-cafe-100 sm:h-10 sm:w-10">
-              <img src={cafeLogo} alt="" className="h-full w-full object-cover" />
+            <span className="grid h-9 w-full sm:h-10 sm:w-10">
+              <img src={cafeLogo} alt="" className="h-full w-full object-fit" />
             </span>
             <span className="truncate font-display text-lg font-bold text-ink-900 sm:text-xl lg:text-2xl">
               Cafe Rubab

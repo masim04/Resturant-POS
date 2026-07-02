@@ -2,7 +2,7 @@ import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import CustomerNavbar from "../components/CustomerNavbar";
 import { DELIVERY_CHARGE_RS, assetUrl } from "../constants";
-
+import { Helmet } from "react-helmet-async";
 function Cart() {
   const { cart, increaseQty, decreaseQty, removeFromCart, getTotal } = useCart();
   const subtotal = getTotal();
@@ -10,6 +10,10 @@ function Cart() {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Cafe Rubab | Your Cart</title>
+        <meta name="description" content="Review your cart at Cafe Rubab. Adjust quantities, remove items, and proceed to checkout." />
+      </Helmet>
       <CustomerNavbar />
 
       <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-10">
