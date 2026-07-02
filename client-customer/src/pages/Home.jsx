@@ -179,6 +179,7 @@ function Home() {
             "@context": "https://schema.org",
             "@type": "Restaurant",
             name: "Cafe Rubab",
+            priceRange: "£10-£30",
             image: "https://caferubab.co.uk/cafe.jpg", // Replace with your actual logo/image URL
             url: "https://caferubab.co.uk",
             telephone: "+44 141 631 4400",
