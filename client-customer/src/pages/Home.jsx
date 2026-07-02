@@ -174,6 +174,45 @@ function Home() {
           name="description"
           content="Enjoy authentic Indian cuisine at Cafe Rubab. View our menu and order online."
         />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Restaurant",
+            name: "Cafe Rubab",
+            image: "https://caferubab.co.uk/cafe.jpg", // Replace with your actual logo/image URL
+            url: "https://caferubab.co.uk",
+            telephone: "+44 141 631 4400",
+            servesCuisine: "Indian",
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: "11 Lovat Pl",
+              addressLocality: "Rutherglen",
+              addressRegion: "Glasgow",
+              postalCode: "G73 5HS",
+              addressCountry: "GB",
+            },
+            openingHoursSpecification: [
+              {
+                "@type": "OpeningHoursSpecification",
+                dayOfWeek: [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Sunday",
+                ],
+                opens: "16:00",
+                closes: "23:00",
+              },
+              {
+                "@type": "OpeningHoursSpecification",
+                dayOfWeek: ["Friday", "Saturday"],
+                opens: "16:00",
+                closes: "00:00",
+              },
+            ],
+          })}
+        </script>
       </Helmet>
       <CustomerNavbar />
 
