@@ -13,6 +13,33 @@ function CustomerFooter() {
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-700">
               Fresh café food in Rutherglen — order online for collection or delivery. Taste you&apos;ll love, served with care.
             </p>
+
+            <div className="mt-6 rounded-3xl border border-cafe-100 bg-cream/70 p-5">
+              <h3 className="font-display text-lg font-bold text-ink-900">Visit Cafe Rubab</h3>
+              <ul className="mt-4 space-y-3 text-sm text-ink-700">
+                <li className="flex gap-2">
+                  <span className="mt-0.5 text-cafe-600">📍</span>
+                  <span>11 Lovat Pl, Rutherglen, Glasgow G73 5HS, United Kingdom</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-0.5 text-cafe-600">📞</span>
+                  <span>+44 141 631 4400</span>
+                </li>
+              </ul>
+              <div className="mt-5">
+                <h4 className="text-sm font-bold text-ink-900">Opening Hours</h4>
+                <div className="mt-3 space-y-1.5 text-sm text-ink-700">
+                  <p>Thursday: 4:00pm – 11:00pm</p>
+                  <p>Friday: 4:00pm – 12:00am</p>
+                  <p>Saturday: 4:00pm – 12:00am</p>
+                  <p>Sunday: 4:00pm – 11:00pm</p>
+                  <p>Monday: 4:00pm – 11:00pm</p>
+                  <p>Tuesday: 4:00pm – 11:00pm</p>
+                  <p>Wednesday: 4:00pm – 11:00pm</p>
+                </div>
+              </div>
+            </div>
+
             <div className="mt-6">
               <p className="text-sm font-bold text-ink-900">Subscribe Our Newsletter</p>
               <form

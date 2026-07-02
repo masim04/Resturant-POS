@@ -43,13 +43,13 @@ function CustomerNavbar() {
         <div className="flex min-h-17 items-center justify-between gap-2 py-2 sm:gap-3 sm:py-3">
           <Link
             to="/"
-            className="flex min-w-0 shrink items-center gap-2 sm:gap-2.5"
+            className="flex min-w-0 max-w-full items-center gap-2 sm:gap-2.5"
             onClick={closeMobile}
           >
-            <span className="grid h-9 w-full sm:h-10 sm:w-10">
-              <img src={cafeLogo} alt="" className="h-full w-full object-fit" />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cafe-100 bg-cafe-50 sm:h-10 sm:w-10">
+              <img src={cafeLogo} alt="Cafe Rubab logo" className="h-full w-full object-cover" />
             </span>
-            <span className="truncate font-display text-lg font-bold text-ink-900 sm:text-xl lg:text-2xl">
+            <span className="truncate font-display text-base font-bold leading-none text-ink-900 sm:text-xl lg:text-2xl">
               Cafe Rubab
             </span>
           </Link>
@@ -157,7 +157,7 @@ function CustomerNavbar() {
                   </NavLink>
                 ),
               )}
-              <NavLink to="/menu" className={mobileNavLinkClass} onClick={closeMobile}>
+              <NavLink to="/menu" className="mt-2 rounded-2xl bg-cafe-400 px-4 py-3.5 text-base font-semibold text-white transition hover:bg-cafe-500" onClick={closeMobile}>
                 Order Now
               </NavLink>
             </nav>

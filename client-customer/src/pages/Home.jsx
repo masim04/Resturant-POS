@@ -367,6 +367,30 @@ function Home() {
               online ordering. From morning coffee to hearty dinners, we&apos;re
               your local spot in Rutherglen for food you&apos;ll love.
             </p>
+
+            <div className="mt-6 rounded-3xl border border-cafe-100 bg-white p-5 shadow-sm">
+              <h3 className="font-display text-xl font-bold text-ink-900">
+                Visit Us
+              </h3>
+              <ul className="mt-4 space-y-3 text-sm text-ink-700">
+                <li className="flex gap-2">
+                  <span className="mt-0.5 text-cafe-600">📍</span>
+                  <span>11 Lovat Pl, Rutherglen, Glasgow G73 5HS, United Kingdom</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-0.5 text-cafe-600">📞</span>
+                  <span>+44 141 631 4400</span>
+                </li>
+              </ul>
+              <div className="mt-4 border-t border-cafe-100 pt-4">
+                <p className="text-sm font-semibold text-ink-900">Opening Hours</p>
+                <p className="mt-2 text-sm text-ink-700">
+                  Thu–Tue: 4:00pm – 11:00pm<br />
+                  Fri–Sat: 4:00pm – 12:00am
+                </p>
+              </div>
+            </div>
+
             <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
               {SERVICES.map((s) => (
                 <div
